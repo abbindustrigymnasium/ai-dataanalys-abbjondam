@@ -2,7 +2,7 @@ import pygame
 import os
 import random
 import sys
-import neat
+# import neat
 
 pygame.init()
 
@@ -11,22 +11,26 @@ pygame.init()
 SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+RUNNING = [pygame.image.load("Dinotelligent\Assets\Dino\DinoRun1.png"), pygame.image.load("Dinotelligent\Assets\Dino\DinoRun2.png")]
 
-RUNNING = [pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Dino\DinoRun1.png"), pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Dino\DinoRun2.png")]
+JUMPING = pygame.image.load("Dinotelligent\Assets\Dino\DinoJump.png")
 
-JUMPING = pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Dino\DinoJump.png")
+DUCKING = [pygame.image.load("Dinotelligent\Assets\Dino\DinoDuck1.png"), pygame.image.load("Dinotelligent\Assets\Dino\DinoDuck2.png")]
 
-SMALL_CACTUS = [pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Cactus\SmallCactus1.png"),
-                pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Cactus\SmallCactus2.png"),
-                pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Cactus\SmallCactus3.png")]
 
-LARGE_CACTUS = [pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Cactus\LargeCactus1.png"),
-                pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Cactus\LargeCactus2.png"),
-                pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Cactus\LargeCactus3.png")]
+SMALL_CACTUS = [pygame.image.load("Dinotelligent\Assets\Cactus\SmallCactus1.png"),
+                pygame.image.load("Dinotelligent\Assets\Cactus\SmallCactus2.png"),
+                pygame.image.load("Dinotelligent\Assets\Cactus\SmallCactus3.png")]
 
-BG = pygame.image.load("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\Other\Track.png")
+LARGE_CACTUS = [pygame.image.load("Dinotelligent\Assets\Cactus\LargeCactus1.png"),
+                pygame.image.load("Dinotelligent\Assets\Cactus\LargeCactus2.png"),
+                pygame.image.load("Dinotelligent\Assets\Cactus\LargeCactus3.png")]
 
-FONT = pygame.font.Font("ai-dataanalys-abbjondam\AI Bootcamp\Dinotelligent\Assets\PressStart2P-Regular.ttf",20)
+# PTERODACTYL = [pygame.image.load("Dinotelligent\Assets\Dino\DinoDuck1.png"), pygame.image.load("Dinotelligent\Assets\Dino\DinoDuck2.png")]
+
+BG = pygame.image.load("Dinotelligent\Assets\Other\Track.png")
+
+FONT = pygame.font.Font("Dinotelligent\Assets\PressStart2P-Regular.ttf",20)
 
 
 class Dinosaur:
@@ -39,6 +43,7 @@ class Dinosaur:
         self.image = img
         self.dino_run = True
         self.dino_jump = False
+        self.dino_duck = False
         self.jump_vel = self.JUMP_VEL
         self.rect = pygame.Rect(self.X_POS, self.Y_POS, img.get_width(), img.get_height())
         self.step_index = 0
@@ -48,6 +53,8 @@ class Dinosaur:
             self.run()
         if self.dino_jump:
             self.jump()
+        if self.dino_duck:
+            self.duck()
         if self.step_index >= 10:
             self.step_index = 0
     
@@ -66,6 +73,12 @@ class Dinosaur:
             self.dino_jump = False 
             self.dino_run = True
             self.jump_vel = self.JUMP_VEL
+
+    def duck(self):
+        self.image = DUCKING[self.step_index // 5]
+        self.rect.x = self.X_POS
+        self.rect.y = self.Y_POS + 37
+        self.step_index += 1
 
     def draw(self, SCREEN):
         SCREEN.blit(self.image, (self.rect.x, self.rect.y))
@@ -94,6 +107,13 @@ class LargeCactus(Obstacle):
     def __init__(self, image, number_of_cacti):
         super().__init__(image, number_of_cacti)
         self.rect.y = 300
+
+# class Pterodactyl(Obstacle):
+#     def __init__(self, image, number_of_cacti):
+#         super().__init__(image, number_of_cacti)
+#         self.rect.y = 300
+
+
 
 def remove(index):
     dinosaurs.pop(index)
@@ -126,6 +146,14 @@ def main():
         if x_pos_bg <= -image_width:
             x_pos_bg = 0
         x_pos_bg -= game_speed
+    
+    def spawnObstacle():
+        rand_int = random.randint(0, 1)
+        if rand_int == 0:
+            obstacles.append(SmallCactus(SMALL_CACTUS, random.randint(0,2)))
+        elif rand_int == 1:
+            obstacles.append(LargeCactus(LARGE_CACTUS, random.randint(0,2)))
+
 
     run = True
     while run:
@@ -143,12 +171,11 @@ def main():
             break
         
         if len(obstacles) == 0:
-            rand_int = random.randint(0, 1)
-            if rand_int == 0:
-                obstacles.append(SmallCactus(SMALL_CACTUS, random.randint(0,2)))
-            elif rand_int == 1:
-                obstacles.append(LargeCactus(LARGE_CACTUS, random.randint(0,2)))
-        
+            spawnObstacle()
+        if len(obstacles) > 0:
+            if obstacles[-1].rect.x < random.randint(0,700):
+                spawnObstacle()
+            
         for obstacle in obstacles:
             obstacle.draw(SCREEN)
             obstacle.update()
@@ -159,9 +186,20 @@ def main():
         user_input = pygame.key.get_pressed()
 
         for i, dinosaur in enumerate(dinosaurs):
-            if user_input[pygame.K_SPACE] or user_input[pygame.K_UP]:
+            if user_input[pygame.K_SPACE] or user_input[pygame.K_UP] or user_input[pygame.K_w]:
                 dinosaur.dino_jump = True
+                dinosaur.dino_duck = False
                 dinosaur.dino_run = False
+            if user_input[pygame.K_LCTRL] or user_input[pygame.K_DOWN] or user_input[pygame.K_s]:
+                dinosaur.dino_duck = True
+                dinosaur.dino_jump = False
+                dinosaur.dino_run = False
+            elif dinosaur.dino_duck == True:
+                dinosaur.dino_run = True
+                dinosaur.dino_jump = False
+                dinosaur.dino_duck = False
+
+                
 
         score()
         background()
