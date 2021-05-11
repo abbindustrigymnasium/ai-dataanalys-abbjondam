@@ -53,3 +53,4 @@ Största problemet var att få NEAT att fungera. I början hoppade de mest rando
 * En förbättring som skulle kunna göras är att spara bästa spelarens neurala nätverk och låta den spela individuelt.
 * En annan förbättring är att kunna träna utan att visuellt kolla på när de kör (vilket skulle gå mycket fortare) och sedan köra vinnaren som i punkten tidigare.
 * En annan förbättring skulle vara att förbättra rensningen av de svaga eftersom fortfarrande efter många generationer så dör de flesta av första hindret.
+* Ändra hopp funktionen så att dinosaurierna inte kan hoppa över de högsta flygödlorna vilken tvingar dem att lära sig att ducka.
