@@ -11,7 +11,7 @@ dataset_path = "OpenCV/face_dataset/"
 
 file_name = input("Name: ")
 
-while(cap.isOpened()):
+while(True):
     ret, frame = cap.read()
 
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
